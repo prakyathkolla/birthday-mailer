@@ -39,7 +39,6 @@ const BirthdayForm = () => {
       parseInt(formData.time.split(':')[1])
     );
 
-    // Here we'll add the email scheduling logic later
     toast({
       title: "Success!",
       description: "Birthday wish has been scheduled!",
@@ -47,39 +46,39 @@ const BirthdayForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto p-6 bg-white rounded-lg shadow-xl">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto">
       <div className="space-y-2">
-        <label className="text-sm font-medium">Recipient's Name</label>
+        <label className="text-sm font-medium text-white">Recipient's Name</label>
         <Input
           required
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           placeholder="Enter recipient's name"
-          className="w-full"
+          className="bg-white/20 text-white placeholder:text-gray-400"
         />
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">Recipient's Email</label>
+        <label className="text-sm font-medium text-white">Recipient's Email</label>
         <Input
           required
           type="email"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           placeholder="Enter recipient's email"
-          className="w-full"
+          className="bg-white/20 text-white placeholder:text-gray-400"
         />
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">Birthday Date</label>
+        <label className="text-sm font-medium text-white">Birthday Date</label>
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant={"outline"}
               className={cn(
-                "w-full justify-start text-left font-normal",
-                !date && "text-muted-foreground"
+                "w-full justify-start text-left font-normal bg-white/20 text-white",
+                !date && "text-gray-400"
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
@@ -98,23 +97,23 @@ const BirthdayForm = () => {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">Time</label>
+        <label className="text-sm font-medium text-white">Time</label>
         <Input
           required
           type="time"
           value={formData.time}
           onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-          className="w-full"
+          className="bg-white/20 text-white"
         />
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">Custom Message (Optional)</label>
+        <label className="text-sm font-medium text-white">Custom Message (Optional)</label>
         <Textarea
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
           placeholder="Enter your custom birthday message"
-          className="w-full"
+          className="bg-white/20 text-white placeholder:text-gray-400"
         />
       </div>
 
