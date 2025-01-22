@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const BirthdayForm = () => {
   const { toast } = useToast();
@@ -18,6 +19,7 @@ const BirthdayForm = () => {
     message: '',
     time: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,18 +33,68 @@ const BirthdayForm = () => {
       return;
     }
 
-    const birthdayDateTime = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      parseInt(formData.time.split(':')[0]),
-      parseInt(formData.time.split(':')[1])
-    );
+    try {
+      setIsSubmitting(true);
 
-    toast({
-      title: "Success!",
-      description: "Birthday wish has been scheduled!",
-    });
+      const birthdayDateTime = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        parseInt(formData.time.split(':')[0]),
+        parseInt(formData.time.split(':')[1])
+      );
+
+      // Insert the birthday wish into Supabase
+      const { data: wish, error } = await supabase
+        .from('birthday_wishes')
+        .insert({
+          recipient_name: formData.name,
+          recipient_email: formData.email,
+          message: formData.message,
+          birthday_date: birthdayDateTime.toISOString(),
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Trigger the email sending function
+      const response = await fetch('/functions/v1/send-birthday-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ wishId: wish.id }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send birthday email');
+      }
+
+      // Reset form
+      setDate(undefined);
+      setFormData({
+        name: '',
+        email: '',
+        message: '',
+        time: ''
+      });
+
+      toast({
+        title: "Success!",
+        description: "Birthday wish has been scheduled and email will be sent!",
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to schedule birthday wish. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -117,8 +169,12 @@ const BirthdayForm = () => {
         />
       </div>
 
-      <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-        Schedule Birthday Wish
+      <Button 
+        type="submit" 
+        className="w-full bg-primary hover:bg-primary/90"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? "Scheduling..." : "Schedule Birthday Wish"}
       </Button>
     </form>
   );
