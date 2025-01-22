@@ -49,7 +49,10 @@ serve(async (req) => {
             to: [{ email: wish.recipient_email }],
           },
         ],
-        from: { email: "prakyath.developer@outlook.com" },
+        from: { 
+          email: "noreply@resend.dev",  // Using SendGrid's default verified sender
+          name: "Birthday Wishes"
+        },
         subject: `Happy Birthday ${wish.recipient_name}! 🎉`,
         content: [
           {
@@ -59,6 +62,7 @@ serve(async (req) => {
                 <h1>Happy Birthday ${wish.recipient_name}! 🎂</h1>
                 ${wish.message ? `<p>${wish.message}</p>` : ""}
                 <p>Wishing you a fantastic day filled with joy and celebration!</p>
+                <p><small>Sent with ❤️ from Birthday Wishes</small></p>
               </div>
             `,
           },
