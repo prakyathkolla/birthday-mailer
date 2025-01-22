@@ -59,18 +59,11 @@ const BirthdayForm = () => {
       if (error) throw error;
 
       // Trigger the email sending function
-      const response = await fetch('/functions/v1/send-birthday-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({ wishId: wish.id }),
+      const { data, error: functionError } = await supabase.functions.invoke('send-birthday-email', {
+        body: { wishId: wish.id }
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to send birthday email');
-      }
+      if (functionError) throw functionError;
 
       // Reset form
       setDate(undefined);
