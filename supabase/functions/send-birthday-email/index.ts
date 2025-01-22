@@ -44,7 +44,7 @@ serve(async (req) => {
     // Prepare email message
     const msg = {
       to: wish.recipient_email,
-      from: "birthday@yourdomain.com", // Update this with your verified sender
+      from: "prakyath.developer@outlook.com", // Updated sender email
       subject: `Happy Birthday ${wish.recipient_name}! 🎉`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
