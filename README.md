@@ -27,15 +27,15 @@ npm run dev
 ```
 
 ## Usage:
-In the current scenario we sometimes miss wishing close people on the most auspicious day. So I created this for scheduling their birthday wishes using this application and incase if you miss it this application does it for you. 
-Enter the `Your name , Recipient's Name , Recipient's Email, Birthday Date, Time and Custom Message (Optional) for sending any custom message`
+# In the current scenario we sometimes miss wishing close people on the most auspicious day. So I created this for scheduling their birthday wishes using this application and incase if you miss it this application does it for you. 
+# Enter the `Your name , Recipient's Name , Recipient's Email, Birthday Date, Time and Custom Message (Optional) for sending any custom message`
 
 ![ScreenShot of Form](images/app.png)
 
 And There You Go ! 🎉
 
-Integrated it with SendGrid for sending the email to Recipient's Email by configuring the email id.
-Integrated it with Supabase for storing the scheduled birthday wishes.
+# Integrated it with SendGrid for sending the email to Recipient's Email by configuring the email id.
+# Integrated it with Supabase for storing the scheduled birthday wishes.
 
 ![ScreenShot of Form](images/message.png)
 
