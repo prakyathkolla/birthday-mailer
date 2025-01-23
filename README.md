@@ -1,18 +1,8 @@
-# Welcome to your Lovable project
+# 🎉Birthday Wisher Emailer!🎉
 
-## Project info
+## Getting started
 
-**URL**: https://lovable.dev/projects/dee1524f-026b-4de9-926f-6eb7dad25b8a
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/dee1524f-026b-4de9-926f-6eb7dad25b8a) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
+You can view a live demo over at https://birthday-emailer.kollaprakyath.dev/
 
 **Use your preferred IDE**
 
@@ -36,19 +26,18 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Usage:
+In the current scenario we sometimes miss wishing close people on the most auspicious day. So I created this for scheduling their birthday wishes using this application and incase if you miss it this application does it for you. 
+Enter the `Your name , Recipient's Name , Recipient's Email, Birthday Date, Time and Custom Message (Optional) for sending any custom message`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+![ScreenShot of Form](images/app.png)
 
-**Use GitHub Codespaces**
+And There You Go ! 🎉
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Integrated it with SendGrid for sending the email to Recipient's Email by configuring the email id.
+Integrated it with Supabase for storing the scheduled birthday wishes.
+
+![ScreenShot of Form](images/message.png)
 
 ## What technologies are used for this project?
 
@@ -59,11 +48,3 @@ This project is built with .
 - React
 - shadcn-ui
 - Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/dee1524f-026b-4de9-926f-6eb7dad25b8a) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
