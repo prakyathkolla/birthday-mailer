@@ -50,7 +50,7 @@ serve(async (req) => {
           },
         ],
         from: { 
-          email: "noreply@resend.dev",  // Using SendGrid's default verified sender
+          email: "prakyath.developer@outlook.com",  // Using your verified email
           name: "Birthday Wishes"
         },
         subject: `Happy Birthday ${wish.recipient_name}! 🎉`,
