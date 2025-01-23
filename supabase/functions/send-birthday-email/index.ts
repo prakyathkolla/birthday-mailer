@@ -50,7 +50,7 @@ serve(async (req) => {
           },
         ],
         from: { 
-          email: "prakyath.developer@outlook.com",  // Using your verified email
+          email: "prakyath.developer@outlook.com",
           name: "Birthday Wishes"
         },
         subject: `Happy Birthday ${wish.recipient_name}! 🎉`,
@@ -62,7 +62,7 @@ serve(async (req) => {
                 <h1>Happy Birthday ${wish.recipient_name}! 🎂</h1>
                 ${wish.message ? `<p>${wish.message}</p>` : ""}
                 <p>Wishing you a fantastic day filled with joy and celebration!</p>
-                <p><small>Sent with ❤️ from Birthday Wishes</small></p>
+                <p><small>Sent with ❤️ from ${wish.sender_name}</small></p>
               </div>
             `,
           },

@@ -17,14 +17,15 @@ const BirthdayForm = () => {
     name: '',
     email: '',
     message: '',
-    time: ''
+    time: '',
+    senderName: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!date || !formData.time || !formData.email || !formData.name) {
+    if (!date || !formData.time || !formData.email || !formData.name || !formData.senderName) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -52,6 +53,7 @@ const BirthdayForm = () => {
           recipient_email: formData.email,
           message: formData.message,
           birthday_date: birthdayDateTime.toISOString(),
+          sender_name: formData.senderName
         })
         .select()
         .single();
@@ -71,7 +73,8 @@ const BirthdayForm = () => {
         name: '',
         email: '',
         message: '',
-        time: ''
+        time: '',
+        senderName: ''
       });
 
       toast({
@@ -92,6 +95,17 @@ const BirthdayForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto">
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-white">Your Name</label>
+        <Input
+          required
+          value={formData.senderName}
+          onChange={(e) => setFormData({ ...formData, senderName: e.target.value })}
+          placeholder="Enter your name"
+          className="bg-white/20 text-white placeholder:text-gray-400"
+        />
+      </div>
+
       <div className="space-y-2">
         <label className="text-sm font-medium text-white">Recipient's Name</label>
         <Input

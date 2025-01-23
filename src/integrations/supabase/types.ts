@@ -17,6 +17,7 @@ export type Database = {
           message: string | null
           recipient_email: string
           recipient_name: string
+          sender_name: string
           sent: boolean | null
           sent_at: string | null
         }
@@ -27,6 +28,7 @@ export type Database = {
           message?: string | null
           recipient_email: string
           recipient_name: string
+          sender_name?: string
           sent?: boolean | null
           sent_at?: string | null
         }
@@ -37,6 +39,7 @@ export type Database = {
           message?: string | null
           recipient_email?: string
           recipient_name?: string
+          sender_name?: string
           sent?: boolean | null
           sent_at?: string | null
         }
