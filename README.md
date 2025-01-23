@@ -39,6 +39,9 @@ Integrated it with Supabase for storing the scheduled birthday wishes.
 
 ![ScreenShot of Form](images/message.png)
 
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 ## What technologies are used for this project?
 
 This project is built with .
