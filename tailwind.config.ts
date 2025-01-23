@@ -66,11 +66,16 @@ export default {
         'confetti': {
           '0%': { transform: 'translateY(0) rotate(0)' },
           '100%': { transform: 'translateY(100vh) rotate(360deg)' }
+        },
+        'fade-in': {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
         }
       },
       animation: {
         'float': 'float 3s ease-in-out infinite',
-        'confetti': 'confetti 3s ease-in-out infinite'
+        'confetti': 'confetti 3s ease-in-out infinite',
+        'fade-in': 'fade-in 0.5s ease-out forwards'
       }
     }
   },

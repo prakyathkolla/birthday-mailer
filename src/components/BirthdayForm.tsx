@@ -1,14 +1,10 @@
 import { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import FormInput from './form/FormInput';
+import DateTimeSelector from './form/DateTimeSelector';
+import MessageInput from './form/MessageInput';
 
 const BirthdayForm = () => {
   const { toast } = useToast();
@@ -21,6 +17,10 @@ const BirthdayForm = () => {
     senderName: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const updateFormData = (field: keyof typeof formData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +45,6 @@ const BirthdayForm = () => {
         parseInt(formData.time.split(':')[1])
       );
 
-      // Insert the birthday wish into Supabase
       const { data: wish, error } = await supabase
         .from('birthday_wishes')
         .insert({
@@ -60,14 +59,12 @@ const BirthdayForm = () => {
 
       if (error) throw error;
 
-      // Trigger the email sending function
       const { data, error: functionError } = await supabase.functions.invoke('send-birthday-email', {
         body: { wishId: wish.id }
       });
 
       if (functionError) throw functionError;
 
-      // Reset form
       setDate(undefined);
       setFormData({
         name: '',
@@ -95,86 +92,42 @@ const BirthdayForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto">
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-white">Your Name</label>
-        <Input
-          required
-          value={formData.senderName}
-          onChange={(e) => setFormData({ ...formData, senderName: e.target.value })}
-          placeholder="Enter your name"
-          className="bg-white/20 text-white placeholder:text-gray-400"
-        />
-      </div>
+      <FormInput
+        label="Your Name"
+        value={formData.senderName}
+        onChange={(value) => updateFormData('senderName', value)}
+        placeholder="Enter your name"
+        required
+      />
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-white">Recipient's Name</label>
-        <Input
-          required
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          placeholder="Enter recipient's name"
-          className="bg-white/20 text-white placeholder:text-gray-400"
-        />
-      </div>
+      <FormInput
+        label="Recipient's Name"
+        value={formData.name}
+        onChange={(value) => updateFormData('name', value)}
+        placeholder="Enter recipient's name"
+        required
+      />
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-white">Recipient's Email</label>
-        <Input
-          required
-          type="email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          placeholder="Enter recipient's email"
-          className="bg-white/20 text-white placeholder:text-gray-400"
-        />
-      </div>
+      <FormInput
+        label="Recipient's Email"
+        value={formData.email}
+        onChange={(value) => updateFormData('email', value)}
+        placeholder="Enter recipient's email"
+        type="email"
+        required
+      />
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-white">Birthday Date</label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "w-full justify-start text-left font-normal bg-white/20 text-white",
-                !date && "text-gray-400"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {date ? format(date, "PPP") : <span>Pick a date</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
+      <DateTimeSelector
+        date={date}
+        time={formData.time}
+        onDateChange={setDate}
+        onTimeChange={(value) => updateFormData('time', value)}
+      />
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-white">Time</label>
-        <Input
-          required
-          type="time"
-          value={formData.time}
-          onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-          className="bg-white/20 text-white"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-white">Custom Message (Optional)</label>
-        <Textarea
-          value={formData.message}
-          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          placeholder="Enter your custom birthday message"
-          className="bg-white/20 text-white placeholder:text-gray-400"
-        />
-      </div>
+      <MessageInput
+        value={formData.message}
+        onChange={(value) => updateFormData('message', value)}
+      />
 
       <Button 
         type="submit" 
