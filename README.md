@@ -4,9 +4,7 @@
 
 You can view a live demo over at https://birthday-emailer.kollaprakyath.dev/
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+**To Run Locally**
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
@@ -27,15 +25,17 @@ npm run dev
 ```
 
 ## Usage:
-# In the current scenario we sometimes miss wishing close people on the most auspicious day. So I created this for scheduling their birthday wishes using this application and incase if you miss it this application does it for you. 
-# Enter the `Your name , Recipient's Name , Recipient's Email, Birthday Date, Time and Custom Message (Optional) for sending any custom message`
+In the current scenario we sometimes miss wishing close people on the most auspicious day. So I created this for scheduling their birthday wishes using this application and incase if you miss it this application does it for you.
+
+Enter the `Your name , Recipient's Name , Recipient's Email, Birthday Date, Time and Custom Message (Optional) for sending any custom message`
 
 ![ScreenShot of Form](images/app.png)
 
 And There You Go ! 🎉
 
-# Integrated it with SendGrid for sending the email to Recipient's Email by configuring the email id.
-# Integrated it with Supabase for storing the scheduled birthday wishes.
+Integrated it with SendGrid for sending the email to Recipient's Email by configuring the email id.
+
+Integrated it with Supabase for storing the scheduled birthday wishes.
 
 ![ScreenShot of Form](images/message.png)
 
