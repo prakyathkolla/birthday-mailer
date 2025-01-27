@@ -24,7 +24,7 @@ serve(async (req) => {
       .from("birthday_email_queue")
       .select("*, birthday_wishes(*)")
       .is("processed_at", null)
-      .limit(10);
+      .limit(1); // Process one at a time to avoid duplicate sends
 
     console.log("Fetched queue entries:", queueEntries);
     console.log("Queue error if any:", queueError);
@@ -43,98 +43,100 @@ serve(async (req) => {
       );
     }
 
-    // Process each queue entry
-    for (const entry of queueEntries) {
-      const wish = entry.birthday_wishes;
-      
-      if (!wish) {
-        console.error("No wish found for queue entry:", entry);
-        continue;
-      }
-
-      // Verify SendGrid API key exists
-      const sendgridApiKey = Deno.env.get("SENDGRID_API_KEY");
-      if (!sendgridApiKey) {
-        throw new Error("SendGrid API key not configured");
-      }
-
-      // Send email using SendGrid API
-      const emailResponse = await fetch("https://api.sendgrid.com/v3/mail/send", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${sendgridApiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          personalizations: [
-            {
-              to: [{ email: wish.recipient_email }],
-            },
-          ],
-          from: { 
-            email: "prakyath.developer@outlook.com",
-            name: "Birthday Wishes"
-          },
-          subject: `Happy Birthday ${wish.recipient_name}! 🎉`,
-          content: [
-            {
-              type: "text/html",
-              value: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                  <h1>Happy Birthday ${wish.recipient_name}! 🎂</h1>
-                  ${wish.message ? `<p>${wish.message}</p>` : ""}
-                  <p>Wishing you a fantastic day filled with joy and celebration!</p>
-                  <p><small>Sent with ❤️ from ${wish.sender_name}</small></p>
-                </div>
-              `,
-            },
-          ],
-        }),
-      });
-
-      const emailResponseText = await emailResponse.text();
-      console.log("SendGrid API response:", {
-        status: emailResponse.status,
-        response: emailResponseText
-      });
-
-      if (!emailResponse.ok) {
-        throw new Error(`Failed to send email: ${emailResponseText}`);
-      }
-
-      // Update queue entry and wish status
-      const now = new Date().toISOString();
-      
-      // Update queue entry
-      const { error: updateQueueError } = await supabaseClient
-        .from("birthday_email_queue")
-        .update({ processed_at: now })
-        .eq("id", entry.id);
-
-      if (updateQueueError) {
-        console.error("Error updating queue entry:", updateQueueError);
-        continue;
-      }
-
-      // Update wish status
-      const { error: updateWishError } = await supabaseClient
-        .from("birthday_wishes")
-        .update({
-          sent: true,
-          sent_at: now,
-        })
-        .eq("id", wish.id);
-
-      if (updateWishError) {
-        console.error("Error updating wish status:", updateWishError);
-        continue;
-      }
-
-      console.log("Successfully processed queue entry:", entry.id);
+    const entry = queueEntries[0];
+    const wish = entry.birthday_wishes;
+    
+    if (!wish) {
+      console.error("No wish found for queue entry:", entry);
+      throw new Error("No wish found for queue entry");
     }
 
+    // Verify SendGrid API key exists
+    const sendgridApiKey = Deno.env.get("SENDGRID_API_KEY");
+    if (!sendgridApiKey) {
+      throw new Error("SendGrid API key not configured");
+    }
+
+    // Send email using SendGrid API
+    const emailResponse = await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${sendgridApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        personalizations: [
+          {
+            to: [{ email: wish.recipient_email }],
+          },
+        ],
+        from: { 
+          email: "prakyath.developer@outlook.com",
+          name: "Birthday Wishes"
+        },
+        subject: `Happy Birthday ${wish.recipient_name}! 🎉`,
+        content: [
+          {
+            type: "text/html",
+            value: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h1>Happy Birthday ${wish.recipient_name}! 🎂</h1>
+                ${wish.message ? `<p>${wish.message}</p>` : ""}
+                <p>Wishing you a fantastic day filled with joy and celebration!</p>
+                <p><small>Sent with ❤️ from ${wish.sender_name}</small></p>
+              </div>
+            `,
+          },
+        ],
+      }),
+    });
+
+    const emailResponseText = await emailResponse.text();
+    console.log("SendGrid API response:", {
+      status: emailResponse.status,
+      response: emailResponseText
+    });
+
+    if (!emailResponse.ok) {
+      throw new Error(`Failed to send email: ${emailResponseText}`);
+    }
+
+    // Update queue entry and wish status
+    const now = new Date().toISOString();
+    
+    // Update queue entry
+    const { error: updateQueueError } = await supabaseClient
+      .from("birthday_email_queue")
+      .update({ processed_at: now })
+      .eq("id", entry.id);
+
+    if (updateQueueError) {
+      console.error("Error updating queue entry:", updateQueueError);
+      throw new Error(`Failed to update queue entry: ${updateQueueError.message}`);
+    }
+
+    // Update wish status
+    const { error: updateWishError } = await supabaseClient
+      .from("birthday_wishes")
+      .update({
+        sent: true,
+        sent_at: now,
+      })
+      .eq("id", wish.id);
+
+    if (updateWishError) {
+      console.error("Error updating wish status:", updateWishError);
+      throw new Error(`Failed to update wish status: ${updateWishError.message}`);
+    }
+
+    console.log("Successfully processed queue entry:", entry.id);
+
     return new Response(
-      JSON.stringify({ message: "Birthday emails processed successfully!" }),
+      JSON.stringify({ 
+        message: "Birthday email sent successfully!",
+        queueEntryId: entry.id,
+        wishId: wish.id
+      }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
