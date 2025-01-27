@@ -84,7 +84,6 @@ export type Database = {
         Row: {
           birthday_date: string | null
           check_time: string | null
-          converted_birthday_date: string | null
           converted_current_time: string | null
           id: string
           recipient_timezone: string | null
@@ -95,7 +94,6 @@ export type Database = {
         Insert: {
           birthday_date?: string | null
           check_time?: string | null
-          converted_birthday_date?: string | null
           converted_current_time?: string | null
           id?: string
           recipient_timezone?: string | null
@@ -106,7 +104,6 @@ export type Database = {
         Update: {
           birthday_date?: string | null
           check_time?: string | null
-          converted_birthday_date?: string | null
           converted_current_time?: string | null
           id?: string
           recipient_timezone?: string | null
