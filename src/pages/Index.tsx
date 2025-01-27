@@ -1,9 +1,31 @@
 import BirthdayForm from "@/components/BirthdayForm";
-import { PartyPopper, Cake, Gift } from "lucide-react";
+import { PartyPopper, Cake, Gift, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
+
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-black via-purple-900 to-black overflow-hidden">
+      {/* Logout Button */}
+      <div className="absolute top-4 right-4 z-20">
+        <Button
+          variant="ghost"
+          className="text-white hover:bg-white/20"
+          onClick={handleLogout}
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          Logout
+        </Button>
+      </div>
+
       {/* 3D Decorative Elements */}
       <div className="absolute inset-0 z-0">
         {/* Floating Balloons with 3D transform */}
