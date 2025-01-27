@@ -26,6 +26,18 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
+    // First, create a queue entry for this wish
+    const { data: queueEntry, error: queueError } = await supabaseClient
+      .from("birthday_email_queue")
+      .insert({ wish_id: wishId })
+      .select()
+      .single();
+
+    if (queueError) {
+      console.error("Error creating queue entry:", queueError);
+      throw new Error(`Failed to create queue entry: ${queueError.message}`);
+    }
+
     // Fetch the birthday wish details
     const { data: wish, error: wishError } = await supabaseClient
       .from("birthday_wishes")
@@ -94,19 +106,33 @@ serve(async (req) => {
       throw new Error(`Failed to send email: ${emailResponseText}`);
     }
 
-    // Update wish status
-    const { error: updateError } = await supabaseClient
+    // Update queue entry and wish status
+    const now = new Date().toISOString();
+
+    const { error: updateQueueError } = await supabaseClient
+      .from("birthday_email_queue")
+      .update({ processed_at: now })
+      .eq("id", queueEntry.id);
+
+    if (updateQueueError) {
+      console.error("Error updating queue status:", updateQueueError);
+      throw new Error(`Failed to update queue status: ${updateQueueError.message}`);
+    }
+
+    const { error: updateWishError } = await supabaseClient
       .from("birthday_wishes")
       .update({
         sent: true,
-        sent_at: new Date().toISOString(),
+        sent_at: now,
       })
       .eq("id", wishId);
 
-    if (updateError) {
-      console.error("Error updating wish status:", updateError);
-      throw new Error(`Failed to update wish status: ${updateError.message}`);
+    if (updateWishError) {
+      console.error("Error updating wish status:", updateWishError);
+      throw new Error(`Failed to update wish status: ${updateWishError.message}`);
     }
+
+    console.log("Successfully processed birthday wish:", wishId);
 
     return new Response(
       JSON.stringify({ message: "Birthday email sent successfully!" }),
