@@ -41,12 +41,31 @@ const BirthdayForm = () => {
     try {
       setIsSubmitting(true);
 
-      const birthdayDateTime = new Date(
+      // Create a date object in the recipient's timezone
+      const [hours, minutes] = formData.time.split(':').map(Number);
+      
+      // First, create a UTC date
+      const birthdayDate = new Date(Date.UTC(
         date.getFullYear(),
         date.getMonth(),
         date.getDate(),
-        parseInt(formData.time.split(':')[0]),
-        parseInt(formData.time.split(':')[1])
+        hours,
+        minutes
+      ));
+
+      // Convert the UTC time to the recipient's timezone
+      const recipientDate = new Date(birthdayDate.toLocaleString('en-US', {
+        timeZone: formData.recipientTimezone
+      }));
+
+      console.log('Original input date:', date);
+      console.log('Time selected:', formData.time);
+      console.log('Recipient timezone:', formData.recipientTimezone);
+      console.log('Final UTC date to be stored:', birthdayDate.toISOString());
+      console.log('How this will appear in recipient timezone:', 
+        recipientDate.toLocaleString('en-US', {
+          timeZone: formData.recipientTimezone
+        })
       );
 
       // Insert the birthday wish
@@ -56,7 +75,7 @@ const BirthdayForm = () => {
           recipient_name: formData.name,
           recipient_email: formData.email,
           message: formData.message,
-          birthday_date: birthdayDateTime.toISOString(),
+          birthday_date: birthdayDate.toISOString(),
           sender_name: formData.senderName,
           sender_timezone: formData.senderTimezone,
           recipient_timezone: formData.recipientTimezone
