@@ -36,7 +36,22 @@ serve(async (req) => {
 
     console.log("Fetched wish:", wish);
 
-    // Send email using SendGrid API directly
+    // Check if it's time to send the email
+    const now = new Date();
+    const scheduledTime = new Date(wish.birthday_date);
+    
+    if (now < scheduledTime) {
+      console.log("Too early to send birthday wish. Scheduled for:", scheduledTime);
+      return new Response(
+        JSON.stringify({ message: "Email will be sent at scheduled time" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        }
+      );
+    }
+
+    // Send email using SendGrid API
     const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
       method: "POST",
       headers: {
