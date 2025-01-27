@@ -13,27 +13,30 @@ serve(async (req) => {
   }
 
   try {
+    console.log("Starting send-birthday-email function");
+    
     // Initialize Supabase client
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Fetch unprocessed queue entries
+    // Fetch one unprocessed queue entry
     const { data: queueEntries, error: queueError } = await supabaseClient
       .from("birthday_email_queue")
       .select("*, birthday_wishes(*)")
       .is("processed_at", null)
-      .limit(1); // Process one at a time to avoid duplicate sends
+      .limit(1);
 
     console.log("Fetched queue entries:", queueEntries);
-    console.log("Queue error if any:", queueError);
-
+    
     if (queueError) {
+      console.error("Error fetching queue:", queueError);
       throw new Error(`Failed to fetch queue: ${queueError.message}`);
     }
 
     if (!queueEntries || queueEntries.length === 0) {
+      console.log("No emails to process");
       return new Response(
         JSON.stringify({ message: "No emails to process" }),
         {
@@ -51,11 +54,16 @@ serve(async (req) => {
       throw new Error("No wish found for queue entry");
     }
 
+    console.log("Processing wish:", wish);
+
     // Verify SendGrid API key exists
     const sendgridApiKey = Deno.env.get("SENDGRID_API_KEY");
     if (!sendgridApiKey) {
+      console.error("SendGrid API key not configured");
       throw new Error("SendGrid API key not configured");
     }
+
+    console.log("Sending email via SendGrid...");
 
     // Send email using SendGrid API
     const emailResponse = await fetch("https://api.sendgrid.com/v3/mail/send", {
@@ -98,8 +106,11 @@ serve(async (req) => {
     });
 
     if (!emailResponse.ok) {
+      console.error("Failed to send email:", emailResponseText);
       throw new Error(`Failed to send email: ${emailResponseText}`);
     }
+
+    console.log("Email sent successfully, updating database records...");
 
     // Update queue entry and wish status
     const now = new Date().toISOString();
