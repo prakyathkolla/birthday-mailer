@@ -89,6 +89,7 @@ export type Database = {
           id: string
           recipient_timezone: string | null
           should_send: boolean | null
+          time_comparison_details: Json | null
           wish_id: string | null
         }
         Insert: {
@@ -99,6 +100,7 @@ export type Database = {
           id?: string
           recipient_timezone?: string | null
           should_send?: boolean | null
+          time_comparison_details?: Json | null
           wish_id?: string | null
         }
         Update: {
@@ -109,6 +111,7 @@ export type Database = {
           id?: string
           recipient_timezone?: string | null
           should_send?: boolean | null
+          time_comparison_details?: Json | null
           wish_id?: string | null
         }
         Relationships: [
