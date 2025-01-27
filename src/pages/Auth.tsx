@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Mail, Lock, LogIn } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -15,34 +15,6 @@ const Auth = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const handleAuthRedirect = async () => {
-      try {
-        // Check if we have a hash in the URL
-        if (window.location.hash) {
-          console.log("Found hash in URL:", window.location.hash);
-          const { data: { session }, error } = await supabase.auth.getSession();
-          
-          if (error) {
-            console.error("Session error:", error);
-            throw error;
-          }
-          
-          if (session) {
-            console.log("Valid session found, redirecting to home...");
-            navigate("/");
-          }
-        }
-      } catch (error: any) {
-        console.error("Auth redirect error:", error);
-        toast({
-          title: "Authentication Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
-    };
-
-    // Check initial auth state
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
@@ -50,7 +22,6 @@ const Auth = () => {
       }
     };
 
-    handleAuthRedirect();
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -60,7 +31,7 @@ const Auth = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, toast]);
+  }, [navigate]);
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,36 +68,6 @@ const Auth = () => {
         description: "Check your email for the confirmation link!",
       });
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    try {
-      setLoading(true);
-      const redirectURL = `${window.location.origin}/auth`;
-      console.log("Starting Google sign in with redirect URL:", redirectURL);
-      
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: redirectURL,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          }
-        },
-      });
-      
-      if (error) throw error;
-    } catch (error: any) {
-      console.error("Google sign in error:", error);
       toast({
         title: "Error",
         description: error.message,
@@ -200,24 +141,6 @@ const Auth = () => {
               disabled={loading}
             >
               Sign Up
-            </Button>
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-600" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="bg-transparent px-2 text-gray-300">Or continue with</span>
-              </div>
-            </div>
-            <Button
-              type="button"
-              onClick={handleGoogleSignIn}
-              variant="outline"
-              className="w-full"
-              disabled={loading}
-            >
-              <LogIn className="mr-2 h-5 w-5" />
-              Google
             </Button>
           </div>
         </form>
