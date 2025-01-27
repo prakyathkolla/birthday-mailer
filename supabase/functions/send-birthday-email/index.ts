@@ -16,21 +16,42 @@ serve(async (req) => {
     const { wishId } = await req.json();
     console.log("Processing wish ID:", wishId);
 
+    if (!wishId) {
+      throw new Error("No wishId provided");
+    }
+
     // Initialize Supabase client
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Fetch the birthday wish and ensure it's in the queue
+    // Fetch the birthday wish from the queue
     const { data: queueItem, error: queueError } = await supabaseClient
       .from("birthday_email_queue")
-      .select("*, birthday_wishes(*)")
+      .select(`
+        *,
+        birthday_wishes (
+          id,
+          recipient_name,
+          recipient_email,
+          message,
+          birthday_date,
+          sender_name,
+          timezone
+        )
+      `)
       .eq("wish_id", wishId)
       .maybeSingle();
 
-    if (queueError || !queueItem) {
+    console.log("Queue item fetch result:", { queueItem, queueError });
+
+    if (queueError) {
       console.error("Error fetching queue item:", queueError);
+      throw new Error(`Failed to fetch queue item: ${queueError.message}`);
+    }
+
+    if (!queueItem) {
       throw new Error("Birthday wish not found in queue");
     }
 
@@ -41,11 +62,17 @@ serve(async (req) => {
 
     console.log("Processing wish:", wish);
 
+    // Verify SendGrid API key exists
+    const sendgridApiKey = Deno.env.get("SENDGRID_API_KEY");
+    if (!sendgridApiKey) {
+      throw new Error("SendGrid API key not configured");
+    }
+
     // Send email using SendGrid API
-    const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+    const emailResponse = await fetch("https://api.sendgrid.com/v3/mail/send", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("SENDGRID_API_KEY")}`,
+        "Authorization": `Bearer ${sendgridApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -75,13 +102,15 @@ serve(async (req) => {
       }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error("SendGrid API error:", errorData);
-      throw new Error(`Failed to send email: ${errorData}`);
-    }
+    const emailResponseText = await emailResponse.text();
+    console.log("SendGrid API response:", {
+      status: emailResponse.status,
+      response: emailResponseText
+    });
 
-    console.log("Email sent successfully");
+    if (!emailResponse.ok) {
+      throw new Error(`Failed to send email: ${emailResponseText}`);
+    }
 
     // Update queue item and wish status
     const now = new Date().toISOString();
@@ -93,7 +122,7 @@ serve(async (req) => {
 
     if (updateQueueError) {
       console.error("Error updating queue status:", updateQueueError);
-      throw new Error("Failed to update queue status");
+      throw new Error(`Failed to update queue status: ${updateQueueError.message}`);
     }
 
     const { error: updateWishError } = await supabaseClient
@@ -106,8 +135,10 @@ serve(async (req) => {
 
     if (updateWishError) {
       console.error("Error updating wish status:", updateWishError);
-      throw new Error("Failed to update wish status");
+      throw new Error(`Failed to update wish status: ${updateWishError.message}`);
     }
+
+    console.log("Successfully processed birthday wish:", wishId);
 
     return new Response(
       JSON.stringify({ message: "Birthday email sent successfully!" }),
@@ -119,7 +150,10 @@ serve(async (req) => {
   } catch (error) {
     console.error("Error in send-birthday-email function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack
+      }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
