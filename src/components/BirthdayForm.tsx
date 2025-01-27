@@ -41,32 +41,34 @@ const BirthdayForm = () => {
     try {
       setIsSubmitting(true);
 
-      // Create a date object in the recipient's timezone
+      // First, create a date object in the recipient's timezone
       const [hours, minutes] = formData.time.split(':').map(Number);
       
-      // First, create a UTC date
-      const birthdayDate = new Date(Date.UTC(
+      // Create a date object in recipient's timezone
+      const recipientDate = new Date(
         date.getFullYear(),
         date.getMonth(),
         date.getDate(),
         hours,
         minutes
-      ));
+      );
 
-      // Convert the UTC time to the recipient's timezone
-      const recipientDate = new Date(birthdayDate.toLocaleString('en-US', {
-        timeZone: formData.recipientTimezone
-      }));
-
-      console.log('Original input date:', date);
-      console.log('Time selected:', formData.time);
-      console.log('Recipient timezone:', formData.recipientTimezone);
-      console.log('Final UTC date to be stored:', birthdayDate.toISOString());
-      console.log('How this will appear in recipient timezone:', 
+      // Convert the recipient's timezone date to UTC for storage
+      const utcBirthdayDate = new Date(
         recipientDate.toLocaleString('en-US', {
           timeZone: formData.recipientTimezone
         })
       );
+
+      console.log('Original input date:', date);
+      console.log('Time selected:', formData.time);
+      console.log('Recipient timezone:', formData.recipientTimezone);
+      console.log('Date in recipient timezone:', 
+        recipientDate.toLocaleString('en-US', {
+          timeZone: formData.recipientTimezone
+        })
+      );
+      console.log('UTC date to be stored:', utcBirthdayDate.toISOString());
 
       // Insert the birthday wish
       const { data: wish, error: insertError } = await supabase
@@ -75,7 +77,7 @@ const BirthdayForm = () => {
           recipient_name: formData.name,
           recipient_email: formData.email,
           message: formData.message,
-          birthday_date: birthdayDate.toISOString(),
+          birthday_date: utcBirthdayDate.toISOString(),
           sender_name: formData.senderName,
           sender_timezone: formData.senderTimezone,
           recipient_timezone: formData.recipientTimezone
