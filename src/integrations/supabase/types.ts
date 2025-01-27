@@ -80,6 +80,47 @@ export type Database = {
         }
         Relationships: []
       }
+      debug_timezone_logs: {
+        Row: {
+          birthday_date: string | null
+          check_time: string | null
+          converted_birthday_date: string | null
+          converted_current_time: string | null
+          id: string
+          recipient_timezone: string | null
+          should_send: boolean | null
+          wish_id: string | null
+        }
+        Insert: {
+          birthday_date?: string | null
+          check_time?: string | null
+          converted_birthday_date?: string | null
+          converted_current_time?: string | null
+          id?: string
+          recipient_timezone?: string | null
+          should_send?: boolean | null
+          wish_id?: string | null
+        }
+        Update: {
+          birthday_date?: string | null
+          check_time?: string | null
+          converted_birthday_date?: string | null
+          converted_current_time?: string | null
+          id?: string
+          recipient_timezone?: string | null
+          should_send?: boolean | null
+          wish_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "debug_timezone_logs_wish_id_fkey"
+            columns: ["wish_id"]
+            isOneToOne: false
+            referencedRelation: "birthday_wishes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
