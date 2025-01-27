@@ -46,10 +46,11 @@ export type Database = {
           message: string | null
           recipient_email: string
           recipient_name: string
+          recipient_timezone: string
           sender_name: string
+          sender_timezone: string
           sent: boolean | null
           sent_at: string | null
-          timezone: string
         }
         Insert: {
           birthday_date: string
@@ -58,10 +59,11 @@ export type Database = {
           message?: string | null
           recipient_email: string
           recipient_name: string
+          recipient_timezone?: string
           sender_name?: string
+          sender_timezone?: string
           sent?: boolean | null
           sent_at?: string | null
-          timezone?: string
         }
         Update: {
           birthday_date?: string
@@ -70,10 +72,11 @@ export type Database = {
           message?: string | null
           recipient_email?: string
           recipient_name?: string
+          recipient_timezone?: string
           sender_name?: string
+          sender_timezone?: string
           sent?: boolean | null
           sent_at?: string | null
-          timezone?: string
         }
         Relationships: []
       }

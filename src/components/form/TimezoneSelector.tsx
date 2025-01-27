@@ -9,9 +9,10 @@ import {
 interface TimezoneSelectorProps {
   value: string;
   onChange: (value: string) => void;
+  label: string;
 }
 
-const TimezoneSelector = ({ value, onChange }: TimezoneSelectorProps) => {
+const TimezoneSelector = ({ value, onChange, label }: TimezoneSelectorProps) => {
   // Common timezone list
   const timezones = [
     'UTC',
@@ -36,7 +37,7 @@ const TimezoneSelector = ({ value, onChange }: TimezoneSelectorProps) => {
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium text-white">Timezone *</label>
+      <label className="text-sm font-medium text-white">{label} *</label>
       <Select value={value} onValueChange={onChange} required>
         <SelectTrigger className="bg-white/20 text-white">
           <SelectValue placeholder="Select timezone" />

@@ -16,7 +16,8 @@ const BirthdayForm = () => {
     message: '',
     time: '',
     senderName: '',
-    timezone: ''
+    senderTimezone: '',
+    recipientTimezone: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -27,7 +28,8 @@ const BirthdayForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!date || !formData.time || !formData.email || !formData.name || !formData.senderName || !formData.timezone) {
+    if (!date || !formData.time || !formData.email || !formData.name || 
+        !formData.senderName || !formData.senderTimezone || !formData.recipientTimezone) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -56,7 +58,8 @@ const BirthdayForm = () => {
           message: formData.message,
           birthday_date: birthdayDateTime.toISOString(),
           sender_name: formData.senderName,
-          timezone: formData.timezone
+          sender_timezone: formData.senderTimezone,
+          recipient_timezone: formData.recipientTimezone
         })
         .select()
         .single();
@@ -84,7 +87,8 @@ const BirthdayForm = () => {
         message: '',
         time: '',
         senderName: '',
-        timezone: ''
+        senderTimezone: '',
+        recipientTimezone: ''
       });
 
       toast({
@@ -113,6 +117,12 @@ const BirthdayForm = () => {
         required
       />
 
+      <TimezoneSelector
+        label="Your Timezone"
+        value={formData.senderTimezone}
+        onChange={(value) => updateFormData('senderTimezone', value)}
+      />
+
       <FormInput
         label="Recipient's Name"
         value={formData.name}
@@ -130,16 +140,17 @@ const BirthdayForm = () => {
         required
       />
 
+      <TimezoneSelector
+        label="Recipient's Timezone"
+        value={formData.recipientTimezone}
+        onChange={(value) => updateFormData('recipientTimezone', value)}
+      />
+
       <DateTimeSelector
         date={date}
         time={formData.time}
         onDateChange={setDate}
         onTimeChange={(value) => updateFormData('time', value)}
-      />
-
-      <TimezoneSelector
-        value={formData.timezone}
-        onChange={(value) => updateFormData('timezone', value)}
       />
 
       <MessageInput
