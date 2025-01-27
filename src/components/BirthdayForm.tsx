@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import FormInput from './form/FormInput';
 import DateTimeSelector from './form/DateTimeSelector';
 import MessageInput from './form/MessageInput';
+import TimezoneSelector from './form/TimezoneSelector';
 
 const BirthdayForm = () => {
   const { toast } = useToast();
@@ -14,7 +15,8 @@ const BirthdayForm = () => {
     email: '',
     message: '',
     time: '',
-    senderName: ''
+    senderName: '',
+    timezone: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -25,7 +27,7 @@ const BirthdayForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!date || !formData.time || !formData.email || !formData.name || !formData.senderName) {
+    if (!date || !formData.time || !formData.email || !formData.name || !formData.senderName || !formData.timezone) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -53,7 +55,8 @@ const BirthdayForm = () => {
           recipient_email: formData.email,
           message: formData.message,
           birthday_date: birthdayDateTime.toISOString(),
-          sender_name: formData.senderName
+          sender_name: formData.senderName,
+          timezone: formData.timezone
         })
         .select()
         .single();
@@ -80,7 +83,8 @@ const BirthdayForm = () => {
         email: '',
         message: '',
         time: '',
-        senderName: ''
+        senderName: '',
+        timezone: ''
       });
 
       toast({
@@ -131,6 +135,11 @@ const BirthdayForm = () => {
         time={formData.time}
         onDateChange={setDate}
         onTimeChange={(value) => updateFormData('time', value)}
+      />
+
+      <TimezoneSelector
+        value={formData.timezone}
+        onChange={(value) => updateFormData('timezone', value)}
       />
 
       <MessageInput
