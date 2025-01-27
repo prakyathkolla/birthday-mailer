@@ -26,41 +26,23 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Fetch the birthday wish from the queue
-    const { data: queueItem, error: queueError } = await supabaseClient
-      .from("birthday_email_queue")
-      .select(`
-        *,
-        birthday_wishes (
-          id,
-          recipient_name,
-          recipient_email,
-          message,
-          birthday_date,
-          sender_name,
-          timezone
-        )
-      `)
-      .eq("wish_id", wishId)
-      .maybeSingle();
+    // Fetch the birthday wish details
+    const { data: wish, error: wishError } = await supabaseClient
+      .from("birthday_wishes")
+      .select("*")
+      .eq("id", wishId)
+      .single();
 
-    console.log("Queue item fetch result:", { queueItem, queueError });
+    console.log("Fetched wish:", wish);
+    console.log("Wish error if any:", wishError);
 
-    if (queueError) {
-      console.error("Error fetching queue item:", queueError);
-      throw new Error(`Failed to fetch queue item: ${queueError.message}`);
+    if (wishError) {
+      throw new Error(`Failed to fetch wish: ${wishError.message}`);
     }
 
-    if (!queueItem) {
-      throw new Error("Birthday wish not found in queue");
-    }
-
-    const wish = queueItem.birthday_wishes;
     if (!wish) {
-      throw new Error("Associated birthday wish not found");
+      throw new Error("Birthday wish not found");
     }
-
-    console.log("Processing wish:", wish);
 
     // Verify SendGrid API key exists
     const sendgridApiKey = Deno.env.get("SENDGRID_API_KEY");
@@ -112,33 +94,19 @@ serve(async (req) => {
       throw new Error(`Failed to send email: ${emailResponseText}`);
     }
 
-    // Update queue item and wish status
-    const now = new Date().toISOString();
-    
-    const { error: updateQueueError } = await supabaseClient
-      .from("birthday_email_queue")
-      .update({ processed_at: now })
-      .eq("id", queueItem.id);
-
-    if (updateQueueError) {
-      console.error("Error updating queue status:", updateQueueError);
-      throw new Error(`Failed to update queue status: ${updateQueueError.message}`);
-    }
-
-    const { error: updateWishError } = await supabaseClient
+    // Update wish status
+    const { error: updateError } = await supabaseClient
       .from("birthday_wishes")
       .update({
         sent: true,
-        sent_at: now,
+        sent_at: new Date().toISOString(),
       })
       .eq("id", wishId);
 
-    if (updateWishError) {
-      console.error("Error updating wish status:", updateWishError);
-      throw new Error(`Failed to update wish status: ${updateWishError.message}`);
+    if (updateError) {
+      console.error("Error updating wish status:", updateError);
+      throw new Error(`Failed to update wish status: ${updateError.message}`);
     }
-
-    console.log("Successfully processed birthday wish:", wishId);
 
     return new Response(
       JSON.stringify({ message: "Birthday email sent successfully!" }),

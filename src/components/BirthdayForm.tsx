@@ -45,7 +45,8 @@ const BirthdayForm = () => {
         parseInt(formData.time.split(':')[1])
       );
 
-      const { data: wish, error } = await supabase
+      // Insert the birthday wish
+      const { data: wish, error: insertError } = await supabase
         .from('birthday_wishes')
         .insert({
           recipient_name: formData.name,
@@ -57,13 +58,21 @@ const BirthdayForm = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (insertError) throw insertError;
 
+      console.log("Created wish:", wish);
+
+      // Call the edge function to send the email
       const { data, error: functionError } = await supabase.functions.invoke('send-birthday-email', {
         body: { wishId: wish.id }
       });
 
-      if (functionError) throw functionError;
+      if (functionError) {
+        console.error("Edge function error:", functionError);
+        throw new Error(`Failed to schedule email: ${functionError.message}`);
+      }
+
+      console.log("Edge function response:", data);
 
       setDate(undefined);
       setFormData({
@@ -76,14 +85,14 @@ const BirthdayForm = () => {
 
       toast({
         title: "Success!",
-        description: "Birthday wish has been scheduled and email will be sent!",
+        description: "Birthday wish has been scheduled!",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to schedule birthday wish. Please try again.",
+        description: error.message || "Failed to schedule birthday wish. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
