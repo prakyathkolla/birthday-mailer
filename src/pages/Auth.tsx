@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Mail, Lock, Google } from "lucide-react";
+import { Mail, Lock, LogIn } from "lucide-react";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -156,7 +156,7 @@ const Auth = () => {
               className="w-full"
               disabled={loading}
             >
-              <Google className="mr-2 h-5 w-5" />
+              <LogIn className="mr-2 h-5 w-5" />
               Google
             </Button>
           </div>
