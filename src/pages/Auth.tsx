@@ -15,26 +15,21 @@ const Auth = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Handle the hash fragment from OAuth redirect
     const handleAuthRedirect = async () => {
       try {
-        // Get the current URL hash
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const accessToken = hashParams.get("access_token");
-        
-        if (accessToken) {
-          console.log("Found access token in URL, checking session...");
+        // Check if we have a hash in the URL
+        if (window.location.hash) {
+          console.log("Found hash in URL:", window.location.hash);
           const { data: { session }, error } = await supabase.auth.getSession();
-          
-          if (session) {
-            console.log("Valid session found, redirecting to home...");
-            navigate("/");
-            return;
-          }
           
           if (error) {
             console.error("Session error:", error);
             throw error;
+          }
+          
+          if (session) {
+            console.log("Valid session found, redirecting to home...");
+            navigate("/");
           }
         }
       } catch (error: any) {
@@ -49,20 +44,16 @@ const Auth = () => {
 
     // Check initial auth state
     const checkAuth = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      console.log("Initial auth state check:", { session, error });
-      
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         navigate("/");
       }
     };
-    
+
     handleAuthRedirect();
     checkAuth();
 
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state changed:", { event, session });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
         navigate("/");
       }
@@ -119,18 +110,20 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     try {
       setLoading(true);
-      console.log("Starting Google sign in...");
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const redirectURL = `${window.location.origin}/auth`;
+      console.log("Starting Google sign in with redirect URL:", redirectURL);
+      
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth`,
+          redirectTo: redirectURL,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
           }
         },
       });
-      console.log("Google sign in response:", { data, error });
+      
       if (error) throw error;
     } catch (error: any) {
       console.error("Google sign in error:", error);
