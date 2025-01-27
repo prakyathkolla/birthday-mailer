@@ -15,16 +15,49 @@ const Auth = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check for authentication state on component mount and URL changes
+    // Handle the hash fragment from OAuth redirect
+    const handleAuthRedirect = async () => {
+      try {
+        // Get the current URL hash
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get("access_token");
+        
+        if (accessToken) {
+          console.log("Found access token in URL, checking session...");
+          const { data: { session }, error } = await supabase.auth.getSession();
+          
+          if (session) {
+            console.log("Valid session found, redirecting to home...");
+            navigate("/");
+            return;
+          }
+          
+          if (error) {
+            console.error("Session error:", error);
+            throw error;
+          }
+        }
+      } catch (error: any) {
+        console.error("Auth redirect error:", error);
+        toast({
+          title: "Authentication Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    };
+
+    // Check initial auth state
     const checkAuth = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
-      console.log("Auth state check:", { session, error });
+      console.log("Initial auth state check:", { session, error });
       
       if (session) {
         navigate("/");
       }
     };
     
+    handleAuthRedirect();
     checkAuth();
 
     // Listen for auth state changes
@@ -36,7 +69,7 @@ const Auth = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, toast]);
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
