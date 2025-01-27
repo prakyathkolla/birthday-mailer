@@ -9,6 +9,35 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      birthday_email_queue: {
+        Row: {
+          created_at: string
+          id: string
+          processed_at: string | null
+          wish_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          processed_at?: string | null
+          wish_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          processed_at?: string | null
+          wish_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "birthday_email_queue_wish_id_fkey"
+            columns: ["wish_id"]
+            isOneToOne: true
+            referencedRelation: "birthday_wishes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       birthday_wishes: {
         Row: {
           birthday_date: string
@@ -20,6 +49,7 @@ export type Database = {
           sender_name: string
           sent: boolean | null
           sent_at: string | null
+          timezone: string
         }
         Insert: {
           birthday_date: string
@@ -31,6 +61,7 @@ export type Database = {
           sender_name?: string
           sent?: boolean | null
           sent_at?: string | null
+          timezone?: string
         }
         Update: {
           birthday_date?: string
@@ -42,6 +73,7 @@ export type Database = {
           sender_name?: string
           sent?: boolean | null
           sent_at?: string | null
+          timezone?: string
         }
         Relationships: []
       }
@@ -50,7 +82,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_and_trigger_birthday_emails: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
