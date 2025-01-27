@@ -12,8 +12,27 @@ interface TimezoneSelectorProps {
 }
 
 const TimezoneSelector = ({ value, onChange }: TimezoneSelectorProps) => {
-  // Get all available timezones
-  const timezones = Intl.supportedValuesOf('timeZone');
+  // Common timezone list
+  const timezones = [
+    'UTC',
+    'America/New_York',
+    'America/Chicago',
+    'America/Denver',
+    'America/Los_Angeles',
+    'America/Phoenix',
+    'America/Anchorage',
+    'Pacific/Honolulu',
+    'Europe/London',
+    'Europe/Paris',
+    'Europe/Berlin',
+    'Europe/Moscow',
+    'Asia/Dubai',
+    'Asia/Kolkata',
+    'Asia/Singapore',
+    'Asia/Tokyo',
+    'Australia/Sydney',
+    'Pacific/Auckland'
+  ];
 
   return (
     <div className="space-y-2">
