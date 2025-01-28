@@ -46,10 +46,7 @@ const Auth = () => {
       setLoading(true);
       const { error } = await supabase.auth.signInWithPassword({
         email,
-        password,
-        options: {
-          persistSession: true // Explicitly enable session persistence
-        }
+        password
       });
       if (error) throw error;
       navigate("/");
@@ -70,10 +67,7 @@ const Auth = () => {
       setLoading(true);
       const { error } = await supabase.auth.signUp({
         email,
-        password,
-        options: {
-          persistSession: true // Explicitly enable session persistence
-        }
+        password
       });
       if (error) throw error;
       toast({
