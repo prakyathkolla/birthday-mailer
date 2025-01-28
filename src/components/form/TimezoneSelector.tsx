@@ -5,6 +5,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 interface TimezoneSelectorProps {
   value: string;
@@ -13,6 +15,8 @@ interface TimezoneSelectorProps {
 }
 
 const TimezoneSelector = ({ value, onChange, label }: TimezoneSelectorProps) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  
   // Complete list of IANA timezones
   const timezones = [
     'Africa/Abidjan', 'Africa/Accra', 'Africa/Addis_Ababa', 'Africa/Algiers', 'Africa/Asmara', 'Africa/Bamako',
@@ -94,6 +98,10 @@ const TimezoneSelector = ({ value, onChange, label }: TimezoneSelectorProps) => 
     'UTC'
   ];
 
+  const filteredTimezones = timezones.filter((timezone) =>
+    timezone.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium text-white">{label} *</label>
@@ -101,12 +109,22 @@ const TimezoneSelector = ({ value, onChange, label }: TimezoneSelectorProps) => 
         <SelectTrigger className="bg-white/20 text-white">
           <SelectValue placeholder="Select timezone" />
         </SelectTrigger>
-        <SelectContent className="max-h-[300px] overflow-y-auto bg-white">
-          {timezones.map((timezone) => (
-            <SelectItem key={timezone} value={timezone}>
-              {timezone.replace('_', ' ')}
-            </SelectItem>
-          ))}
+        <SelectContent className="bg-white">
+          <div className="p-2">
+            <Input
+              placeholder="Search timezone..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="mb-2"
+            />
+          </div>
+          <div className="max-h-[300px] overflow-y-auto">
+            {filteredTimezones.map((timezone) => (
+              <SelectItem key={timezone} value={timezone}>
+                {timezone.replace(/_/g, ' ')}
+              </SelectItem>
+            ))}
+          </div>
         </SelectContent>
       </Select>
     </div>
