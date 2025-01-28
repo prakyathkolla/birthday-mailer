@@ -37,17 +37,17 @@ Enter the `Your name , Your Timezone, Recipient's Name , Recipient's Email, Reci
 
 And There You Go ! 🎉
 
-Integrated it with SendGrid for sending the email to Recipient's Email by configuring the email id.
+Integrated it with `SendGrid` for sending the email to Recipient's Email by configuring the email id.
 
-Integrated it with Supabase for storing the scheduled birthday wishes.
+Integrated it with `Supabase` for storing the scheduled birthday wishes.
 
 ![ScreenShot of Form](images/message.png)
 
-Handled all the timezone issues in the backend. So you can just enter the time at which recipient should receive in their timezone and it will be done.
+Handled all the `timezone` issues in the backend. So you can just enter the time at which recipient should receive in their timezone and it will be done.
 
 Configured the cron job running every minute to trigger email when the date and time is matched with current time in their respective timezone.
 
-Used IANA Timezone for this.
+Used `IANA Timezone` for this.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
