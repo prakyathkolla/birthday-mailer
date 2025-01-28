@@ -1,4 +1,4 @@
-# 🎉Birthday Wisher Emailer!🎉
+# 🎉Birthday Emailer!🎉
 
 ## Getting started
 
@@ -27,7 +27,11 @@ npm run dev
 ## Usage:
 In the current scenario we sometimes miss wishing close people on the most auspicious day. So I created this for scheduling their birthday wishes using this application and incase if you miss it this application does it for you.
 
-Enter the `Your name , Recipient's Name , Recipient's Email, Birthday Date, Time and Custom Message (Optional) for sending any custom message`
+Create an account using Email and give the password and then click signup and you will receive an email with which you can login and from next time you can enter email and password and click signin.
+
+![ScreenShot of Form](images/login.png)
+
+Enter the `Your name , Your Timezone, Recipient's Name , Recipient's Email, Recipient's Timezone, Birthday Date, Time and Custom Message (Optional) for sending any custom message`
 
 ![ScreenShot of Form](images/app.png)
 
@@ -38,6 +42,12 @@ Integrated it with SendGrid for sending the email to Recipient's Email by config
 Integrated it with Supabase for storing the scheduled birthday wishes.
 
 ![ScreenShot of Form](images/message.png)
+
+Handled all the timezone issues in the backend. So you can just enter the time at which recipient should receive in their timezone and it will be done.
+
+Configured the cron job running every minute to trigger email when the date and time is matched with current time in their respective timezone.
+
+Used IANA Timezone for this.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
