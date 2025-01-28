@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Mail, Lock, Loader2 } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2 } from "lucide-react";
+import EmailInput from "./EmailInput";
+import PasswordInput from "./PasswordInput";
+import RememberEmail from "./RememberEmail";
 
 interface AuthFormProps {
   onSubmit: (email: string, password: string) => Promise<void>;
@@ -24,7 +24,6 @@ const AuthForm = ({
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
-  // Load saved email on component mount
   useEffect(() => {
     const savedEmail = localStorage.getItem("savedEmail");
     const savedRememberMe = localStorage.getItem("rememberMe") === "true";
@@ -38,7 +37,6 @@ const AuthForm = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Save or remove email based on remember me checkbox
     if (rememberMe) {
       localStorage.setItem("savedEmail", email);
       localStorage.setItem("rememberMe", "true");
@@ -58,52 +56,9 @@ const AuthForm = ({
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-6">
       <div className="space-y-4">
-        <div>
-          <Label htmlFor="email" className="text-white">
-            Email
-          </Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pl-10"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
-        </div>
-
-        <div>
-          <Label htmlFor="password" className="text-white">
-            Password
-          </Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="pl-10"
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="rememberMe"
-            checked={rememberMe}
-            onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-          />
-          <Label htmlFor="rememberMe" className="text-sm text-white cursor-pointer">
-            Remember email
-          </Label>
-        </div>
+        <EmailInput email={email} onChange={setEmail} />
+        <PasswordInput password={password} onChange={setPassword} />
+        <RememberEmail checked={rememberMe} onCheckedChange={setRememberMe} />
       </div>
 
       <div className="space-y-4">
