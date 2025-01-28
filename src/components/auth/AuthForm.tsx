@@ -24,15 +24,13 @@ const AuthForm = ({
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
-  // Load saved credentials on component mount
+  // Load saved email on component mount
   useEffect(() => {
     const savedEmail = localStorage.getItem("savedEmail");
-    const savedPassword = localStorage.getItem("savedPassword");
     const savedRememberMe = localStorage.getItem("rememberMe") === "true";
 
-    if (savedRememberMe && savedEmail && savedPassword) {
+    if (savedRememberMe && savedEmail) {
       setEmail(savedEmail);
-      setPassword(savedPassword);
       setRememberMe(true);
     }
   }, []);
@@ -40,14 +38,12 @@ const AuthForm = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Save or remove credentials based on remember me checkbox
+    // Save or remove email based on remember me checkbox
     if (rememberMe) {
       localStorage.setItem("savedEmail", email);
-      localStorage.setItem("savedPassword", password);
       localStorage.setItem("rememberMe", "true");
     } else {
       localStorage.removeItem("savedEmail");
-      localStorage.removeItem("savedPassword");
       localStorage.removeItem("rememberMe");
     }
 
@@ -105,7 +101,7 @@ const AuthForm = ({
             onCheckedChange={(checked) => setRememberMe(checked as boolean)}
           />
           <Label htmlFor="rememberMe" className="text-sm text-white cursor-pointer">
-            Remember me
+            Remember email
           </Label>
         </div>
       </div>
