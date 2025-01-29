@@ -2,7 +2,7 @@
 
 ## 🔗 Live Demo
 
-[Visit Weather Website](https://birthday-emailer.kollaprakyath.dev/)
+[Visit Birthday Website](https://birthday-emailer.kollaprakyath.dev/)
 
 ---
 
